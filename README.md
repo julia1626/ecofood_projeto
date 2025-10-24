@@ -108,7 +108,8 @@ classDiagram
 
 ## Diagrama de Casos de Uso
 
-usecaseDiagram
+```mermaid
+
     %% Atores
     actor Garcom as "Garçom"
     actor Cozinha
@@ -148,6 +149,7 @@ usecaseDiagram
     (Enviar pedido para cozinha) ..> (Atualizar status do pedido) : <<include>>
     (Preparar pedido) ..> (Atualizar status do pedido) : <<include>>
 
+    ```
 
 ## Materiais Utilizados
 
