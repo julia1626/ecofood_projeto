@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface MenuItem {
   _id: string;
@@ -20,8 +21,14 @@ export default function GarcomPage() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [tableNumber, setTableNumber] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const router = useRouter();
 
   useEffect(() => {
+    const userRole = localStorage.getItem('userRole');
+    if (userRole !== 'garcom') {
+      router.push('/');
+      return;
+    }
     fetchMenuItems();
   }, []);
 
@@ -94,9 +101,22 @@ export default function GarcomPage() {
     ? menuItems.filter(item => item.category === selectedCategory)
     : menuItems;
 
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    router.push('/');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-8">Interface do Garçom</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Painel do Garçom</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        >
+          Sair
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Menu */}

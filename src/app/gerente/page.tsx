@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface MenuItem {
   _id: string;
@@ -27,8 +28,14 @@ export default function GerentePage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [newItem, setNewItem] = useState({ name: '', price: 0, category: '' });
   const [activeTab, setActiveTab] = useState('cardapio');
+  const router = useRouter();
 
   useEffect(() => {
+    const userRole = localStorage.getItem('userRole');
+    if (userRole !== 'gerente') {
+      router.push('/');
+      return;
+    }
     fetchMenuItems();
     fetchOrders();
   }, []);
@@ -64,9 +71,22 @@ export default function GerentePage() {
       .reduce((total, order) => total + order.total, 0);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    router.push('/');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-8">Painel do Gerente</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Painel do Gerente</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        >
+          Sair
+        </button>
+      </div>
 
       <div className="mb-4">
         <button
