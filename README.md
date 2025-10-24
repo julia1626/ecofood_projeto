@@ -14,18 +14,16 @@ Fluxo principal:
 
 1. O Gerente cadastra itens do cardápio (nome, preço, categoria).
 2. O Garçom cria pedidos, informa o número da mesa, adiciona itens e envia o pedido para a cozinha.
-3. A Cozinha acessa a tela "Cozinha" que lista apenas os pedidos no status **Recebido** em ordem de chegada (primeiro a entrar = primeiro a mostrar).
+3. A Cozinha acessa a tela "Cozinha" que lista apenas os pedidos no status **Recebido** em ordem de chegada.
 4. A Cozinha atualiza o status para **Em Preparo** e depois para **Entregue** quando finalizado.
-5. O Gerente visualiza todos os pedidos e o faturamento (soma dos valores de pedidos entregues, com filtros por período).
-
-Funcionalidade bônus: cálculo automático do valor total do pedido (somatória dos itens × quantidades + observações se houver).
+5. O Gerente visualiza todos os pedidos e o faturamento (soma dos valores de pedidos entregues).
 
 ## Requisitos Funcionais
 
 1. **CRUD de Itens do Cardápio**
 
    * Criar, ler, atualizar e excluir itens do cardápio.
-   * Cada item: `id`, `nome`, `preco` (decimal), `categoria` (entrada, prato principal, sobremesa, bebida, etc).
+   * Cada item: `id`, `nome`, `preco` (decimal), `categoria` (massas, saladas, sobremesas, bebidas, etc).
 
 2. **Gerenciamento de Pedidos**
 
@@ -40,12 +38,8 @@ Funcionalidade bônus: cálculo automático do valor total do pedido (somatória
 
 4. **Visão do Gerente**
 
-   * Visualizar todos os pedidos (filtros por status e período).
-   * Ver faturamento total por período (por exemplo: hoje, semana, mês) — soma dos `valorTotal` de pedidos entregues.
-
-5. **Cálculo de Valor do Pedido (Bônus)**
-
-   * Cada pedido deve expor um campo calculado `valorTotal = Σ (item.preco × quantidade)`.
+   * Visualizar todos os pedidos.
+   * Ver faturamento total — soma dos `valorTotal` de pedidos entregues.
 
 ## Requisitos Não-Funcionais
 
