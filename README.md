@@ -103,8 +103,51 @@ classDiagram
     Pedido "1" -- "*" PedidoItem : contem
     Pedido "*" -- "1" Usuario : criadoPor
     Pedido "*" -- "1" Mesa : referenteA
-    
+
 ```
+
+## Diagrama de Casos de Uso
+
+usecaseDiagram
+    %% Atores
+    actor Garcom as "Garçom"
+    actor Cozinha
+    actor Gerente
+
+    %% Casos de uso
+    (Realizar pedido)
+    (Adicionar item ao pedido)
+    (Remover item do pedido)
+    (Alterar quantidade do item)
+    (Enviar pedido para cozinha)
+    (Atualizar status do pedido)
+    (Preparar pedido)
+    (Entregar pedido)
+    (Gerenciar cardápio)
+    (Visualizar relatórios)
+    (Login / Autenticação)
+
+    %% Associações
+    Garcom --> (Realizar pedido)
+    Garcom --> (Adicionar item ao pedido)
+    Garcom --> (Remover item do pedido)
+    Garcom --> (Alterar quantidade do item)
+    Garcom --> (Enviar pedido para cozinha)
+
+    Cozinha --> (Preparar pedido)
+    Cozinha --> (Atualizar status do pedido)
+    Cozinha --> (Entregar pedido)
+
+    Gerente --> (Gerenciar cardápio)
+    Gerente --> (Visualizar relatórios)
+
+    %% Relações entre casos de uso
+    (Realizar pedido) ..> (Adicionar item ao pedido) : <<include>>
+    (Realizar pedido) ..> (Remover item do pedido) : <<include>>
+    (Realizar pedido) ..> (Alterar quantidade do item) : <<include>>
+    (Enviar pedido para cozinha) ..> (Atualizar status do pedido) : <<include>>
+    (Preparar pedido) ..> (Atualizar status do pedido) : <<include>>
+
 
 ## Materiais Utilizados
 
