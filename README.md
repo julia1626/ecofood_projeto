@@ -57,7 +57,7 @@ Funcionalidade bônus: cálculo automático do valor total do pedido (somatória
 
 ## Modelagem e Diagrama de Classes
 
-```mermaid
+<details>
 classDiagram
     class ItemCardapio {
         +String id
@@ -103,9 +103,10 @@ classDiagram
     Pedido "*" -- "1" Usuario : criadoPor
     Pedido "*" -- "1" Mesa : referenteA
 
-    %% Enum-like note
-    note "Status do Pedido: Recebido, Em Preparo, Entregue" as N1
-```
+    %% Nota sobre o status
+    note right of Pedido : Status do Pedido\n- Recebido\n- Em Preparo\n- Entregue
+
+</details>
 
 ## Materiais Utilizados
 
