@@ -99,6 +99,11 @@ classDiagram
         +String localizacao (opcional)
     }
 
+    ItemCardapio "1" -- "*" PedidoItem : referencia
+    Pedido "1" -- "*" PedidoItem : contem
+    Pedido "*" -- "1" Usuario : criadoPor
+    Pedido "*" -- "1" Mesa : referenteA
+    
 ```
 
 ## Materiais Utilizados
