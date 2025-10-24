@@ -6,7 +6,7 @@ interface MenuItem {
   _id: string;
   name: string;
   price: number;
-  category: string;
+  validate: Date;
 }
 
 interface Order {
@@ -16,6 +16,7 @@ interface Order {
     menuItem: MenuItem;
     quantity: number;
     price: number;
+    validate: Date;
   }>;
   status: string;
   total: number;
@@ -57,7 +58,7 @@ export default function CozinhaPage() {
         {orders.map((order) => (
           <div key={order._id} className="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-400">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Mesa {order.tableNumber}</h2>
+              <h2 className="text-xl font-bold">Pedido {order.tableNumber}</h2>
               <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">
                 {order.status}
               </span>

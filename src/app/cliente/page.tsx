@@ -16,16 +16,17 @@ interface OrderItem {
   price: number;
 }
 
-export default function GarcomPage() {
+export default function ClientePage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [tableNumber, setTableNumber] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'produtos' | 'pedido'>('produtos');
   const router = useRouter();
 
   useEffect(() => {
     const userRole = localStorage.getItem('userRole');
-    if (userRole !== 'garcom') {
+    if (userRole !== 'cliente') {
       router.push('/');
       return;
     }
@@ -91,6 +92,7 @@ export default function GarcomPage() {
     if (response.ok) {
       setOrderItems([]);
       alert('Pedido enviado com sucesso!');
+      setActiveTab('produtos');
     } else {
       alert('Erro ao enviar pedido');
     }
@@ -107,27 +109,50 @@ export default function GarcomPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Painel do Garçom</h1>
+    <div className="min-h-screen bg-[#FFF8F3] p-8 font-sans">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[#b94b4b]/30 pb-4">
+        <h1 className="text-3xl font-bold text-[#b94b4b] mb-4 md:mb-0">Painel do Cliente</h1>
         <button
           onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          className="bg-[#b94b4b] text-white px-4 py-2 rounded hover:bg-[#a43f3f] transition-colors"
         >
           Sair
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Menu */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Cardápio</h2>
+      {/* Tabs */}
+      <div className="mb-8 flex flex-wrap gap-4">
+        <button
+          onClick={() => setActiveTab('produtos')}
+          className={`px-5 py-2 rounded-full font-medium transition-colors ${
+            activeTab === 'produtos'
+              ? 'bg-[#b94b4b] text-white shadow-md'
+              : 'bg-white text-[#b94b4b] border border-[#b94b4b]/50 hover:bg-[#fff2ef]'
+          }`}
+        >
+          Produtos
+        </button>
+        <button
+          onClick={() => setActiveTab('pedido')}
+          className={`px-5 py-2 rounded-full font-medium transition-colors ${
+            activeTab === 'pedido'
+              ? 'bg-[#b94b4b] text-white shadow-md'
+              : 'bg-white text-[#b94b4b] border border-[#b94b4b]/50 hover:bg-[#fff2ef]'
+          }`}
+        >
+          Pedido Atual
+        </button>
+      </div>
 
+      {/* Aba: Produtos */}
+      {activeTab === 'produtos' && (
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-[#b94b4b]/20">
           <div className="mb-4">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="border p-2 rounded mr-2"
+              className="border border-[#b94b4b]/30 p-2 rounded shadow-inner focus:outline-none focus:border-[#b94b4b]"
             >
               <option value="">Todas as categorias</option>
               {categories.map(category => (
@@ -138,13 +163,16 @@ export default function GarcomPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
             {filteredMenuItems.map((item) => (
-              <div key={item._id} className="border p-4 rounded">
-                <h3 className="font-bold">{item.name}</h3>
-                <p>R$ {item.price.toFixed(2)}</p>
-                <p className="text-gray-600 text-sm">{item.category}</p>
+              <div
+                key={item._id}
+                className="border border-[#b94b4b]/20 p-4 rounded-lg bg-[#fffdfc] hover:shadow-md transition"
+              >
+                <h3 className="font-bold text-lg text-[#b94b4b]">{item.name}</h3>
+                <p className="text-gray-700">R$ {item.price.toFixed(2)}</p>
+                <p className="text-sm text-gray-500">{item.category}</p>
                 <button
                   onClick={() => addToOrder(item)}
-                  className="mt-2 bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+                  className="mt-2 bg-[#b94b4b] text-white px-3 py-1 rounded text-sm hover:bg-[#a43f3f] transition-colors"
                 >
                   Adicionar
                 </button>
@@ -152,46 +180,38 @@ export default function GarcomPage() {
             ))}
           </div>
         </div>
+      )}
 
-        {/* Order */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Pedido Atual</h2>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Número da Mesa:</label>
-            <input
-              type="number"
-              value={tableNumber}
-              onChange={(e) => setTableNumber(parseInt(e.target.value))}
-              className="border p-2 rounded w-full"
-              min="1"
-            />
-          </div>
-
-          <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
+      {/* Aba: Pedido Atual */}
+      {activeTab === 'pedido' && (
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-[#b94b4b]/20">
+          <div className="space-y-2 mb-4 max-h-96 overflow-y-auto">
+            {orderItems.length === 0 && (
+              <p className="text-gray-500">Nenhum item no pedido.</p>
+            )}
             {orderItems.map((item) => (
-              <div key={item.menuItem._id} className="flex justify-between items-center border-b pb-2">
+              <div key={item.menuItem._id} className="flex justify-between items-center border-b border-[#b94b4b]/20 pb-2">
                 <div>
-                  <span className="font-medium">{item.menuItem.name}</span>
+                  <span className="font-medium text-[#b94b4b]">{item.menuItem.name}</span>
                   <span className="text-gray-600 ml-2">R$ {item.price.toFixed(2)}</span>
                 </div>
                 <div className="flex items-center">
                   <button
                     onClick={() => updateQuantity(item.menuItem._id, item.quantity - 1)}
-                    className="bg-red-500 text-white px-2 py-1 rounded mr-1"
+                    className="bg-red-500 text-white px-2 py-1 rounded mr-1 hover:bg-red-600 transition-colors"
                   >
                     -
                   </button>
                   <span className="mx-2">{item.quantity}</span>
                   <button
                     onClick={() => updateQuantity(item.menuItem._id, item.quantity + 1)}
-                    className="bg-green-500 text-white px-2 py-1 rounded mr-1"
+                    className="bg-green-500 text-white px-2 py-1 rounded mr-1 hover:bg-green-600 transition-colors"
                   >
                     +
                   </button>
                   <button
                     onClick={() => removeFromOrder(item.menuItem._id)}
-                    className="bg-gray-500 text-white px-2 py-1 rounded"
+                    className="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600 transition-colors"
                   >
                     Remover
                   </button>
@@ -200,20 +220,20 @@ export default function GarcomPage() {
             ))}
           </div>
 
-          <div className="border-t pt-4">
-            <div className="text-xl font-bold mb-4">
+          <div className="border-t border-[#b94b4b]/20 pt-4">
+            <div className="text-xl font-bold mb-4 text-[#b94b4b]">
               Total: R$ {calculateTotal().toFixed(2)}
             </div>
             <button
               onClick={submitOrder}
               disabled={orderItems.length === 0}
-              className="w-full bg-blue-500 text-white py-3 px-4 rounded hover:bg-blue-600 disabled:bg-gray-400"
+              className="w-full bg-[#b94b4b] text-white py-3 px-4 rounded hover:bg-[#a43f3f] disabled:bg-gray-400 transition-colors"
             >
               Enviar Pedido
             </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
