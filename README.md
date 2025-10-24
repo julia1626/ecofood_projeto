@@ -57,7 +57,8 @@ Funcionalidade bônus: cálculo automático do valor total do pedido (somatória
 
 ## Modelagem e Diagrama de Classes
 
-<details>
+```mermaid
+
 classDiagram
     class ItemCardapio {
         +String id
@@ -98,15 +99,7 @@ classDiagram
         +String localizacao (opcional)
     }
 
-    ItemCardapio "1" -- "*" PedidoItem : referencia
-    Pedido "1" -- "*" PedidoItem : contem
-    Pedido "*" -- "1" Usuario : criadoPor
-    Pedido "*" -- "1" Mesa : referenteA
-
-    %% Nota sobre o status
-    note right of Pedido : Status do Pedido\n- Recebido\n- Em Preparo\n- Entregue
-
-</details>
+```
 
 ## Materiais Utilizados
 
@@ -122,3 +115,4 @@ classDiagram
 ### Link Protótipo Figma
 
 - https://www.figma.com/design/zJQQMcfR0YbetZWRZiGxgC/Untitled?node-id=0-1&t=HD38VQpEIknod6Y6-1
+
