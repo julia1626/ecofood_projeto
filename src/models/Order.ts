@@ -7,7 +7,7 @@ export interface IOrderItem {
 }
 
 export interface IOrder extends Document {
-  tableNumber: number;
+  endereco: string;
   items: IOrderItem[];
   status: 'Recebido' | 'Em Preparo' | 'Entregue';
   total: number;
@@ -22,7 +22,7 @@ const OrderItemSchema: Schema = new Schema({
 });
 
 const OrderSchema: Schema = new Schema({
-  tableNumber: { type: Number, required: true },
+  endereco: { type: String, required: true },
   items: [OrderItemSchema],
   status: { type: String, enum: ['Recebido', 'Em Preparo', 'Entregue'], default: 'Recebido' },
   total: { type: Number, required: true },

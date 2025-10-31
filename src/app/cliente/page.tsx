@@ -8,12 +8,14 @@ interface MenuItem {
   name: string;
   price: number;
   category: string;
+  validade: Date;
 }
 
 interface OrderItem {
   menuItem: MenuItem;
   quantity: number;
   price: number;
+  validade: Date;
 }
 
 export default function ClientePage() {
@@ -48,7 +50,7 @@ export default function ClientePage() {
           : item
       ));
     } else {
-      setOrderItems([...orderItems, { menuItem, quantity: 1, price: menuItem.price }]);
+      setOrderItems([...orderItems, { menuItem, quantity: 1, price: menuItem.price, validade: menuItem.validade }]);
     }
   };
 
@@ -75,11 +77,15 @@ export default function ClientePage() {
   const submitOrder = async () => {
     if (orderItems.length === 0) return;
 
+    const total = calculateTotal(); // total do pedido
+    localStorage.setItem('orderTotal', total.toFixed(2)); 
+
     const orderData = {
       tableNumber,
       items: orderItems.map(item => ({
         menuItem: item.menuItem._id,
         quantity: item.quantity,
+        validade: item.validade,
       })),
     };
 
@@ -90,13 +96,12 @@ export default function ClientePage() {
     });
 
     if (response.ok) {
-      setOrderItems([]);
-      alert('Pedido enviado com sucesso!');
-      setActiveTab('produtos');
-    } else {
-      alert('Erro ao enviar pedido');
-    }
-  };
+    setOrderItems([]);
+    router.push('/pagamento'); // redireciona para escolher forma de pagamento
+  } else {
+    alert('Erro ao enviar pedido');
+  }
+};
 
   const categories = [...new Set(menuItems.map(item => item.category))];
   const filteredMenuItems = selectedCategory
@@ -170,6 +175,7 @@ export default function ClientePage() {
                 <h3 className="font-bold text-lg text-[#b94b4b]">{item.name}</h3>
                 <p className="text-gray-700">R$ {item.price.toFixed(2)}</p>
                 <p className="text-sm text-gray-500">{item.category}</p>
+                <p className="text-sm text-gray-400">{new Date(item.validade).toLocaleDateString()}</p>
                 <button
                   onClick={() => addToOrder(item)}
                   className="mt-2 bg-[#b94b4b] text-white px-3 py-1 rounded text-sm hover:bg-[#a43f3f] transition-colors"
@@ -229,7 +235,7 @@ export default function ClientePage() {
               disabled={orderItems.length === 0}
               className="w-full bg-[#b94b4b] text-white py-3 px-4 rounded hover:bg-[#a43f3f] disabled:bg-gray-400 transition-colors"
             >
-              Enviar Pedido
+              Finalizar Pedido
             </button>
           </div>
         </div>

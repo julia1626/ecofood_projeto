@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     const body = await request.json();
-    const { tableNumber, items } = body;
+    const { endereco, items } = body;
 
     // Calculate total and validate items
     let total = 0;
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     const order = new Order({
-      tableNumber,
+      endereco,
       items: validatedItems,
       total,
     });

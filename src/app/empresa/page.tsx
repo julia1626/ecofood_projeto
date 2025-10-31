@@ -11,8 +11,8 @@ interface MenuItem {
 }
 
 interface Order {
+  endereco: string;
   _id: string;
-  tableNumber: number;
   items: Array<{
     menuItem: MenuItem;
     quantity: number;
@@ -38,6 +38,8 @@ export default function EmpresaPage() {
     }
     fetchMenuItems();
     fetchOrders();
+    const interval = setInterval(fetchOrders, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchMenuItems = async () => {
@@ -71,6 +73,18 @@ export default function EmpresaPage() {
       .reduce((total, order) => total + order.total, 0);
   };
 
+  const updateOrderStatus = async (orderId: string, status: string) => {
+    const response = await fetch('/api/orders', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: orderId, status }),
+    });
+
+    if (response.ok) {
+      fetchOrders();
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('userRole');
     router.push('/');
@@ -91,43 +105,31 @@ export default function EmpresaPage() {
 
       {/* Tabs */}
       <div className="mb-8 flex flex-wrap gap-4">
-        <button
-          onClick={() => setActiveTab('cardapio')}
-          className={`px-5 py-2 rounded-full font-medium transition-colors ${
-            activeTab === 'cardapio'
-              ? 'bg-[#b94b4b] text-white shadow-md'
-              : 'bg-white text-[#b94b4b] border border-[#b94b4b]/50 hover:bg-[#fff2ef]'
-          }`}
-        >
-          Gerenciar Produtos
-        </button>
-        <button
-          onClick={() => setActiveTab('pedidos')}
-          className={`px-5 py-2 rounded-full font-medium transition-colors ${
-            activeTab === 'pedidos'
-              ? 'bg-[#b94b4b] text-white shadow-md'
-              : 'bg-white text-[#b94b4b] border border-[#b94b4b]/50 hover:bg-[#fff2ef]'
-          }`}
-        >
-          Ver Pedidos
-        </button>
-        <button
-          onClick={() => setActiveTab('faturamento')}
-          className={`px-5 py-2 rounded-full font-medium transition-colors ${
-            activeTab === 'faturamento'
-              ? 'bg-[#b94b4b] text-white shadow-md'
-              : 'bg-white text-[#b94b4b] border border-[#b94b4b]/50 hover:bg-[#fff2ef]'
-          }`}
-        >
-          Faturamento
-        </button>
+        {['cardapio', 'pedidos', 'faturamento', 'demanda'].map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-5 py-2 rounded-full font-medium transition-colors ${
+              activeTab === tab
+                ? 'bg-[#b94b4b] text-white shadow-md'
+                : 'bg-white text-[#b94b4b] border border-[#b94b4b]/50 hover:bg-[#fff2ef]'
+            }`}
+          >
+            {tab === 'cardapio'
+              ? 'Gerenciar Produtos'
+              : tab === 'pedidos'
+              ? 'Ver Pedidos'
+              : tab === 'faturamento'
+              ? 'Faturamento'
+              : 'Demanda'}
+          </button>
+        ))}
       </div>
 
       {/* Aba: Cardápio */}
       {activeTab === 'cardapio' && (
         <div className="bg-white p-8 rounded-lg shadow-lg border border-[#b94b4b]/20">
           <h2 className="text-2xl font-bold text-[#b94b4b] mb-6">Gerenciar Produtos</h2>
-
           <form onSubmit={handleAddMenuItem} className="mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <input
@@ -172,7 +174,9 @@ export default function EmpresaPage() {
               >
                 <h3 className="font-bold text-lg text-[#b94b4b]">{item.name}</h3>
                 <p className="text-gray-700">R$ {item.price.toFixed(2)}</p>
-                <p className="text-sm text-gray-500">{new Date(item.validade).toLocaleDateString('pt-BR')}</p>
+                <p className="text-sm text-gray-500">
+                  {new Date(item.validade).toLocaleDateString('pt-BR')}
+                </p>
               </div>
             ))}
           </div>
@@ -190,7 +194,7 @@ export default function EmpresaPage() {
                 className="border border-[#b94b4b]/20 p-4 rounded bg-[#fffdfc] hover:shadow-md transition"
               >
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold text-[#b94b4b]">Mesa {order.tableNumber}</span>
+                  <span className="font-semibold text-[#b94b4b]">Endereço {order.endereco}</span>
                   <span
                     className={`px-2 py-1 rounded text-sm ${
                       order.status === 'Recebido'
@@ -235,6 +239,65 @@ export default function EmpresaPage() {
           <p className="text-gray-700">
             <strong>Total de Pedidos:</strong> {orders.length}
           </p>
+        </div>
+      )}
+
+      {/* Aba: demanda */}
+      {activeTab === 'demanda' && (
+        <div className="bg-white p-8 rounded-lg shadow-lg border border-[#b94b4b]/20">
+          <h2 className="text-2xl font-bold text-[#b94b4b] mb-6">Tela de Demanda</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {orders.map((order) => (
+              <div
+                key={order._id}
+                className="bg-[#fffdfc] p-6 rounded-lg shadow-md border-l-4 border-yellow-400"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold">Endereço {order.endereco}</h3>
+                  <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">
+                    {order.status}
+                  </span>
+                </div>
+
+                <ul className="space-y-1 mb-4">
+                  {order.items.map((item, index) => (
+                    <li key={index} className="text-sm">
+                      {item.quantity}x {item.menuItem.name} - R$ {(item.price * item.quantity).toFixed(2)}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="font-bold text-[#b94b4b] mb-4">
+                  Total do Pedido: R$ {order.total.toFixed(2)}
+                </div>
+
+                <div className="text-sm text-gray-600 mb-4">
+                  Recebido em: {new Date(order.createdAt).toLocaleString('pt-BR')}
+                </div>
+
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => updateOrderStatus(order._id, 'Em Preparo')}
+                    className="flex-1 bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600"
+                  >
+                    Em Preparo
+                  </button>
+                  <button
+                    onClick={() => updateOrderStatus(order._id, 'Entregue')}
+                    className="flex-1 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                  >
+                    Entregue
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {orders.length === 0 && (
+              <div className="text-center text-gray-500 mt-12 col-span-full">
+                <p className="text-xl">Nenhum pedido pendente no momento.</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
